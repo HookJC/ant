@@ -1,0 +1,15 @@
+# This file is a template, and might need editing before it works on your project.
+# use the official gcc image, based on debian
+# can use verions as well, like gcc:5.2
+# see https://hub.docker.com/_/gcc/
+image: alpine:latest
+
+build:
+  stage: build
+  before_script:
+    - apk update && apk upgrade
+    - apk add gcc g++ make cmake
+  script:
+    - mkdir build && cd build
+    - CC=gcc CXX=g++ cmake ..
+    - make progress
