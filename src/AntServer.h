@@ -31,11 +31,14 @@ protected:
     TransferProcess status_;
 
 public:
-    AntServer(const std::string &path_);
+    AntServer();
 
     void listen(const std::string &host, const port_t port);
 
     RequestPayload wait();
+
+    bool fopen(const std::string &path_);
+    void fclose();
 
     void accept();
 

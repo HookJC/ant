@@ -2,6 +2,7 @@
 // Created by sunnysab on 2021/6/29.
 //
 
+#include <stdexcept>
 #include "RequestPayload.h"
 #include "RecvResponse.h"
 #include "DataPayload.h"
@@ -79,7 +80,8 @@ Frame Frame::deserialize(std::vector<uint8_t> &frame) {
 
     auto calculated_crc32 = calc_crc32(payload);
     if (calculated_crc32 != crc32) {
-        throw std::exception("Invalid payload: CRC32 check failed.");
+		std::logic_error ex("Invalid payload: CRC32 check failed.");
+        throw std::exception(ex);
     }
 
     // Detect frame type
@@ -93,8 +95,10 @@ Frame Frame::deserialize(std::vector<uint8_t> &frame) {
         case FrameType::Data:
             DataPayload::deserialize(payload, reinterpret_cast<DataPayload **>(&p_payload));
             break;
-        default:
-            throw std::exception("Unexpected frame type.");
+        default:{
+			std::logic_error ex("Unexpected frame type.");		
+            throw std::exception(ex);
+		}
     }
 
     Frame result(seq, ack, static_cast<FrameType>(type));

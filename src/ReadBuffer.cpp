@@ -4,7 +4,7 @@
 
 #include <cassert>
 #include <fstream>
-#include <filesystem>
+#include <filesystem.h>
 #include "ReadBuffer.h"
 
 
@@ -51,8 +51,12 @@ void ReadBuffer::read_from_file() {
     std::vector<uint8_t> disk_buffer(size_to_read);
 
     this->in_stream_->read(reinterpret_cast<char *>(disk_buffer.data()), size_to_read);
-    for_each(disk_buffer.begin(), disk_buffer.begin() + this->in_stream_->gcount(), [this](
-            auto ch) { this->buffer_.push(ch); });
+    //for_each(disk_buffer.begin(), disk_buffer.begin() + this->in_stream_->gcount(), [this](
+    //        auto ch) { this->buffer_.push(ch); });
+
+    for (auto it = disk_buffer.begin(); it < disk_buffer.begin() + this->in_stream_->gcount(); it++){
+        buffer_.push(*it);
+    }
 
     if (this->in_stream_->eof())
         this->end_flag_ = true;

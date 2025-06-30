@@ -11,3 +11,7 @@ CTestTestfile.cmake
 _deps
 .idea/
 cmake-build-*/
+x64
+arm-sf
+arm-hf
+

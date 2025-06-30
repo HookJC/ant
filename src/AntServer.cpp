@@ -3,24 +3,17 @@
 //
 
 #include <stdexcept>
-#include <filesystem>
+#include <filesystem.h>
+#include <string.h>
 #include <protocol/RequestPayload.h>
 #include <protocol/RecvResponse.h>
 #include <protocol/DataPayload.h>
 #include "AntServer.h"
 
 
-AntServer::AntServer(const std::string &path_) {
-    this->out_ = new std::ofstream;
-    this->file_path_ = path_;
-    this->out_->open(path_, std::ios::out | std::ios::binary | std::ios::trunc);
-
-    if (!this->out_->is_open()) {
-        std::string msg = (std::string) "Could not open this file: " + strerror(errno);
-        throw std::exception(msg.c_str());
-    }
-    // this->file_size_ = std::filesystem::file_size(path_);
-    this->buffer_ = new WriteBuffer(this->out_);
+AntServer::AntServer() {
+    out_    = nullptr;
+    buffer_ = nullptr;
 }
 
 void AntServer::listen(const std::string &host, const port_t port) {
@@ -34,6 +27,29 @@ RequestPayload AntServer::wait() {
     auto request = Frame::deserialize(request_bin.payload);
     this->file_size_ = reinterpret_cast<RequestPayload *>(request.payload)->file_size;
     return *dynamic_cast<RequestPayload *>(request.payload);
+}
+
+bool AntServer::fopen(const std::string &path_) {
+    this->out_ = new std::ofstream;
+    this->file_path_ = path_;
+    this->out_->open(path_, std::ios::out | std::ios::binary | std::ios::trunc);
+
+    if (!this->out_->is_open()) {
+        printf("Could not open this file: %s\n", strerror(errno));
+        return false;
+    }
+
+    // this->file_size_ = fs::file_size(path_);
+    this->buffer_ = new WriteBuffer(this->out_);
+    return true;
+}
+
+void AntServer::fclose(){
+    if (!out_) return;
+    delete buffer_;
+    buffer_ = nullptr;
+    out_->close();
+    out_ = nullptr;
 }
 
 void AntServer::close() {
@@ -56,9 +72,14 @@ void AntServer::write(const std::function<bool(TransferProcess)> &callback) {
         this->buffer_->write(content);
         status.completed_size += content.size();
 
-        if (!callback(status)) {
-            throw std::exception("Process broken because us er cancelled.");
+        if (callback && !callback(status)) {
+            std::logic_error ex("Process broken because us er cancelled.");
+            throw std::exception(ex);
+        } else if(!callback) {
+            printf("%zu/%zu\n", status.completed_size, status.total_size);
         }
+
+        this->accept();
     }
     this->buffer_->flush();
 }

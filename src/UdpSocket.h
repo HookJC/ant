@@ -5,7 +5,22 @@
 #pragma once
 
 #include <vector>
+#if defined(WIN32)
 #include <winsock2.h>
+#else
+#include <unistd.h>
+#include <sys/types.h>          /* See NOTES */
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
+#define INVALID_SOCKET -1
+#define SOCKET_ERROR -1
+#define closesocket close
+
+typedef int SOCKET;
+
+#endif
 
 using byte = unsigned char;
 using port_t = unsigned short;

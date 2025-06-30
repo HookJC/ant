@@ -4,7 +4,7 @@
 
 #include <cassert>
 #include <fstream>
-#include <filesystem>
+#include <filesystem.h>
 #include "WriteBuffer.h"
 
 WriteBuffer::WriteBuffer(std::ofstream *stream) {

@@ -27,16 +27,17 @@ protected:
     ReadBuffer buffer_;
     size_t file_size_;
     std::string file_path_;
+    std::string file_path_dst_;
 
     TransferProcess status_;
 
 protected:
-    static std::string_view parse_file_name(const std::string &s);
+    static std::string parse_file_name(const std::string &s);
 
     RequestPayload *prepare_send_request();
 
 public:
-    AntClient(const std::string &path_);
+    AntClient(const std::string &path_, const std::string &path_dst_);
 
     void connect(const std::string &host, const port_t port);
 

@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <vector>
 #include <string>
+#include <stdexcept>
 #include "Frame.h"
 
 
@@ -20,7 +21,8 @@ public:
     virtual void serialize_append(std::vector<uint8_t> &out) = 0;
 
     static void deserialize(std::vector<uint8_t> &content, Payload **payload) {
-        throw std::exception("You can not use deserialize function in abstract Payload.");
+		std::logic_error ex("You can not use deserialize function in abstract Payload.");
+        throw std::exception(ex);
     }
 
     virtual bool operator==(const Payload *other) const = 0;
